@@ -1,0 +1,20 @@
+{
+  "lite": {
+    "inStock": true,
+    "totalRamGb": 16,
+    "stockCount": 16,
+    "lastUpdated": "2026-09-18T11:40:00.000Z"
+  },
+  "basic": {
+    "inStock": true,
+    "totalRamGb": 32,
+    "stockCount": 32,
+    "lastUpdated": "2026-09-18T11:40:00.000Z"
+  },
+  "prime": {
+    "inStock": true,
+    "totalRamGb": 16,
+    "stockCount": 16,
+    "lastUpdated": "2026-09-18T11:40:00.000Z"
+  }
+}

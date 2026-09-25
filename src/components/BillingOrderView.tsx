@@ -11,6 +11,35 @@ import EWalletBadges, { QrisLogo, GpnLogo } from './EWalletLogos';
 
 export type { SelectedPackageDetails };
 
+const EGGS_BY_NEST: Record<string, string[]> = {
+  "Minecraft - Bedrock": [
+    "Vanilla Bedrock",
+    "PocketMine-MP",
+    "NukkitX / Cloudburst",
+    "PowerNukkit",
+    "Bedrock Dedicated Server (BDS)",
+    "Geyser-Standalone"
+  ],
+  "Minecraft - Java": [
+    "Paper",
+    "Purpur",
+    "Spigot",
+    "Vanilla Java",
+    "Fabric",
+    "Forge",
+    "NeoForge",
+    "Mohist",
+    "Arclight"
+  ],
+  "Minecraft - Proxy": [
+    "Velocity",
+    "BungeeCord",
+    "Waterfall",
+    "FlameCord",
+    "Travertine"
+  ]
+};
+
 interface BillingOrderViewProps {
   packageDetails: SelectedPackageDetails;
   onBackToPlans: () => void;
@@ -24,14 +53,29 @@ export default function BillingOrderView({
   onProceedCheckout,
   stock
 }: BillingOrderViewProps) {
-  // Form state matching Screenshot (51), (52), (53), (54), (55)
-  const [serverName, setServerName] = useState("manz's Server");
-  const [buyerName, setBuyerName] = useState("Buyer");
-  const [accountPassword, setAccountPassword] = useState("Password");
+  // Form state
+  const [serverName, setServerName] = useState("");
+  const [buyerName, setBuyerName] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
   const [nest, setNest] = useState("Minecraft - Bedrock");
-  const [serverVersion, setServerVersion] = useState("Vanilla Bedrock (REKOMEN)");
+  const [serverVersion, setServerVersion] = useState("Vanilla Bedrock");
   const [dockerImage, setDockerImage] = useState("ghcr.io/ptero-eggs/yolks:debian");
   const [billingCycle, setBillingCycle] = useState("monthly");
+
+  const handleNestChange = (selectedNest: string) => {
+    setNest(selectedNest);
+    const availableEggs = EGGS_BY_NEST[selectedNest] || [];
+    if (availableEggs.length > 0) {
+      setServerVersion(availableEggs[0]);
+    }
+    if (selectedNest === "Minecraft - Java") {
+      setDockerImage("ghcr.io/pterodactyl/yolks:java_21");
+    } else if (selectedNest === "Minecraft - Proxy") {
+      setDockerImage("ghcr.io/pterodactyl/yolks:java_21");
+    } else {
+      setDockerImage("ghcr.io/ptero-eggs/yolks:debian");
+    }
+  };
   const [addPortDefault, setAddPortDefault] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
@@ -44,7 +88,7 @@ export default function BillingOrderView({
 
   // Price calculations
   const basePrice = packageDetails.price;
-  const portDefaultPrice = addPortDefault ? 100000 : 0;
+  const portDefaultPrice = addPortDefault ? 50000 : 0;
   
   let cycleMultiplier = 1;
   let cycleLabel = "Monthly";
@@ -131,8 +175,8 @@ export default function BillingOrderView({
   const sendWhatsAppOrder = () => {
     const tierTitle = packageDetails.tierId === 'lite' ? 'Lite' : packageDetails.tierId === 'basic' ? 'Basic' : 'Prime';
     const packetAndGame = `${tierTitle} ${packageDetails.ramGb}GB - MINECRAFT`;
-    const buyerVal = buyerName.trim() || 'Buyer';
-    const passwordVal = accountPassword.trim() || 'Password';
+    const buyerVal = buyerName.trim() || '-';
+    const passwordVal = accountPassword.trim() || '-';
     const softwareEggVal = serverVersion || 'software egg';
     const biayaVal = formatPrice(finalTotal);
 
@@ -142,7 +186,7 @@ export default function BillingOrderView({
 > \`\`\`⌬ Packet & Game:\`\`\`
 ➥ \` ${packetAndGame} 
 
-> \`\`\`⌬ Buyer:\`\`\`
+> \`\`\`⌬ Username:\`\`\`
 ➥ \`${buyerVal}\`
 
 > \`\`\`⌬ Password:\`\`\`
@@ -349,20 +393,20 @@ export default function BillingOrderView({
                 />
               </div>
 
-              {/* Buyer & Password Panel */}
+              {/* Username & Password */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400">Buyer</label>
+                  <label className="text-xs font-bold text-slate-400">Username</label>
                   <input
                     type="text"
                     value={buyerName}
                     onChange={(e) => setBuyerName(e.target.value)}
                     className="w-full bg-[#081226] border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-500 transition-colors"
-                    placeholder="Nama Buyer"
+                    placeholder="Username"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400">Password Panel</label>
+                  <label className="text-xs font-bold text-slate-400">Password</label>
                   <input
                     type="text"
                     value={accountPassword}
@@ -373,126 +417,222 @@ export default function BillingOrderView({
                 </div>
               </div>
 
-              {/* Grid 2 Cols: Nest & Server Version matching Screenshot (52) */}
+              {/* Grid 2 Cols: Tipe Server (nest) & Egg */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Nest */}
+                {/* Tipe Server (nest) */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400">Nest</label>
+                  <label className="text-xs font-bold text-slate-400">Tipe Server (nest)</label>
                   <select
                     value={nest}
-                    onChange={(e) => setNest(e.target.value)}
+                    onChange={(e) => handleNestChange(e.target.value)}
                     className="w-full bg-[#081226] border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer"
                   >
                     <option value="Minecraft - Bedrock">Minecraft - Bedrock</option>
                     <option value="Minecraft - Java">Minecraft - Java</option>
+                    <option value="Minecraft - Proxy">Minecraft - Proxy</option>
                   </select>
                 </div>
 
-                {/* Server Version */}
+                {/* Egg */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400">Server Version</label>
+                  <label className="text-xs font-bold text-slate-400">Egg</label>
                   <select
                     value={serverVersion}
                     onChange={(e) => setServerVersion(e.target.value)}
                     className="w-full bg-[#081226] border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer"
                   >
-                    <option value="Vanilla Bedrock (REKOMEN)">Vanilla Bedrock (REKOMEN)</option>
-                    <option value="PocketMine-MP">PocketMine-MP</option>
-                    <option value="Nukkit">Nukkit</option>
-                    <option value="Paper 1.21.4 (Java)">Paper 1.21.4 (Java)</option>
-                    <option value="Purpur 1.21.4 (Java)">Purpur 1.21.4 (Java)</option>
+                    {(EGGS_BY_NEST[nest] || [serverVersion]).map((eggName) => (
+                      <option key={eggName} value={eggName}>
+                        {eggName}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* ENGINE COMPARISON: BEDROCK matching Screenshot (53) & (54) */}
-              <div className="space-y-3 pt-1">
-                <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-slate-400">
-                  <Layers className="w-3.5 h-3.5 text-slate-400" />
-                  <span>ENGINE COMPARISON: BEDROCK</span>
+              {/* ENGINE COMPARISON matching selected nest */}
+              {nest === 'Minecraft - Bedrock' && (
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-slate-400">
+                    <Layers className="w-3.5 h-3.5 text-slate-400" />
+                    <span>ENGINE COMPARISON: BEDROCK</span>
+                  </div>
+
+                  {/* Vanilla Bedrock Card */}
+                  <div className="bg-[#071322] border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                    <div className="flex items-center gap-2 text-emerald-400 font-extrabold text-xs uppercase tracking-wider">
+                      <Check className="w-4 h-4" />
+                      <span>VANILLA BEDROCK</span>
+                    </div>
+                    <div className="space-y-2 pt-1 text-xs sm:text-[13px] text-slate-300">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Natural mob spawning (100%)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Full Mob AI & Mechanics</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Precise Redstone & Farms</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-cyan-400 font-semibold">
+                        <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span>Ultra-stable Performance</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pocketmine Card */}
+                  <div className="bg-[#071322] border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                    <div className="flex items-center gap-2 text-rose-400 font-extrabold text-xs uppercase tracking-wider">
+                      <span>/</span>
+                      <span>POCKETMINE</span>
+                    </div>
+                    <div className="space-y-2 pt-1 text-xs sm:text-[13px] text-slate-400">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>No natural mob spawning</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>Very limited Mob AI</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>Redstone mechanics broken</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Supports Plugins (PHP)</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              )}
 
-                {/* Vanilla Bedrock Card */}
-                <div className="bg-[#071322] border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2.5">
-                  <div className="flex items-center gap-2 text-emerald-400 font-extrabold text-xs uppercase tracking-wider">
-                    <Check className="w-4 h-4" />
-                    <span>VANILLA BEDROCK</span>
+              {nest === 'Minecraft - Java' && (
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-slate-400">
+                    <Layers className="w-3.5 h-3.5 text-slate-400" />
+                    <span>ENGINE COMPARISON: JAVA</span>
                   </div>
-                  <div className="space-y-2 pt-1 text-xs sm:text-[13px] text-slate-300">
-                    <div className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>Natural mob spawning (100%)</span>
+
+                  {/* Paper / Purpur Card */}
+                  <div className="bg-[#071322] border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                    <div className="flex items-center gap-2 text-emerald-400 font-extrabold text-xs uppercase tracking-wider">
+                      <Check className="w-4 h-4" />
+                      <span>PAPER / PURPUR (REKOMENDASI)</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>Full Mob AI & Mechanics</span>
+                    <div className="space-y-2 pt-1 text-xs sm:text-[13px] text-slate-300">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Async Chunk Loading & High TPS</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Mendukung Ribuan Plugin Spigot / Bukkit</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Built-in Anti X-Ray & Anti-Exploit</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-cyan-400 font-semibold">
+                        <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span>Stabil 20 TPS bahkan dengan banyak pemain</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>Precise Redstone & Farms</span>
+                  </div>
+
+                  {/* Vanilla Java Card */}
+                  <div className="bg-[#071322] border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                    <div className="flex items-center gap-2 text-rose-400 font-extrabold text-xs uppercase tracking-wider">
+                      <span>/</span>
+                      <span>VANILLA JAVA</span>
                     </div>
-                    <div className="flex items-center gap-2 text-cyan-400 font-semibold">
-                      <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                      <span>Ultra-stable Performance</span>
+                    <div className="space-y-2 pt-1 text-xs sm:text-[13px] text-slate-400">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>Tidak support plugin (hanya datapack)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>Beban single-thread CPU berat</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>Rentan lag saat chunk generation</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>100% Vanilla Mechanics & Bug-for-bug</span>
+                      </div>
                     </div>
                   </div>
                 </div>
+              )}
 
-                {/* Pocketmine Card */}
-                <div className="bg-[#071322] border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2.5">
-                  <div className="flex items-center gap-2 text-rose-400 font-extrabold text-xs uppercase tracking-wider">
-                    <span>/</span>
-                    <span>POCKETMINE</span>
+              {nest === 'Minecraft - Proxy' && (
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-slate-400">
+                    <Layers className="w-3.5 h-3.5 text-slate-400" />
+                    <span>ENGINE COMPARISON: PROXY NETWORK</span>
                   </div>
-                  <div className="space-y-2 pt-1 text-xs sm:text-[13px] text-slate-400">
-                    <div className="flex items-center gap-2">
-                      <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                      <span>No natural mob spawning</span>
+
+                  {/* Velocity Card */}
+                  <div className="bg-[#071322] border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                    <div className="flex items-center gap-2 text-emerald-400 font-extrabold text-xs uppercase tracking-wider">
+                      <Check className="w-4 h-4" />
+                      <span>VELOCITY (REKOMENDASI MODERN)</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                      <span>Very limited Mob AI</span>
+                    <div className="space-y-2 pt-1 text-xs sm:text-[13px] text-slate-300">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Arsitektur modern & performa paling ringan</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Modern player forwarding & kompresi cepat</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Perlindungan tinggi terhadap serangan bot</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-cyan-400 font-semibold">
+                        <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span>Support koneksi multi-server luas</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                      <span>Redstone mechanics broken</span>
+                  </div>
+
+                  {/* BungeeCord Card */}
+                  <div className="bg-[#071322] border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                    <div className="flex items-center gap-2 text-rose-400 font-extrabold text-xs uppercase tracking-wider">
+                      <span>/</span>
+                      <span>BUNGEECORD (LEGACY)</span>
                     </div>
-                    <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>Supports Plugins (PHP)</span>
+                    <div className="space-y-2 pt-1 text-xs sm:text-[13px] text-slate-400">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>Overhead memori & CPU lebih tinggi</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>Rentan overload saat bot attack massal</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>Protokol forwarding klasik</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Banyak plugin lama yang kompatibel</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Docker Image / Java Version dropdown matching Screenshot (54) & (55) */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-400">Docker Image / Java Version</label>
-                <select
-                  value={dockerImage}
-                  onChange={(e) => setDockerImage(e.target.value)}
-                  className="w-full bg-[#081226] border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer"
-                >
-                  <option value="ghcr.io/ptero-eggs/yolks:debian">ghcr.io/ptero-eggs/yolks:debian</option>
-                  <option value="ghcr.io/pterodactyl/yolks:java_21">ghcr.io/pterodactyl/yolks:java_21 (Java 21)</option>
-                  <option value="ghcr.io/pterodactyl/yolks:java_17">ghcr.io/pterodactyl/yolks:java_17 (Java 17)</option>
-                </select>
-              </div>
-
-              {/* Billing Cycle dropdown matching Screenshot (55) */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-400">Billing Cycle</label>
-                <select
-                  value={billingCycle}
-                  onChange={(e) => setBillingCycle(e.target.value)}
-                  className="w-full bg-[#081226] border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer"
-                >
-                  <option value="monthly">Bulanan (Normal)</option>
-                  <option value="3months">3 Bulan (Hemat 5%)</option>
-                  <option value="6months">6 Bulan (Hemat 10%)</option>
-                  <option value="annual">Tahunan (Hemat 20%)</option>
-                </select>
-              </div>
+              )}
 
               {/* Port Default Tambahan / Dedicated IP matching Screenshot (55) */}
               <div className="space-y-1.5 pt-1">
@@ -516,7 +656,7 @@ export default function BillingOrderView({
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-purple-400 font-extrabold text-sm">+Rp 100.000</span>
+                    <span className="text-purple-400 font-extrabold text-sm">+50k</span>
                     <span className="text-slate-400 text-xs">/mo</span>
                   </div>
                 </label>
@@ -566,13 +706,13 @@ export default function BillingOrderView({
               {/* Avatar & User Details */}
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white font-black text-xl flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.35)] uppercase">
-                  {(buyerName || 'B').charAt(0)}
+                  {(buyerName.trim() || 'U').charAt(0)}
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-white leading-snug">{buyerName || 'Buyer'}</h3>
+                  <h3 className="text-base font-black text-white leading-snug">{buyerName.trim() || 'Username'}</h3>
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                    Buyer
+                    Account
                   </span>
                 </div>
               </div>
@@ -629,7 +769,7 @@ export default function BillingOrderView({
                 {addPortDefault && (
                   <div className="flex justify-between items-center text-purple-400">
                     <span className="font-medium">Port Default Tambahan</span>
-                    <span className="font-bold">+Rp 100.000</span>
+                    <span className="font-bold">+{formatPrice(portDefaultPrice)}</span>
                   </div>
                 )}
 

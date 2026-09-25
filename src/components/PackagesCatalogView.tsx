@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   ArrowLeft, Cpu, HardDrive, Zap, 
   Check, ChevronRight, LayoutDashboard, Store, Folder
@@ -51,7 +51,7 @@ export default function PackagesCatalogView({
   onSelectPackage,
   stock
 }: PackagesCatalogViewProps) {
-  const [activeTier, setActiveTier] = useState<PlanId>(initialTier);
+  const activeTier = initialTier;
 
   const currentTierInfo = TIER_PACKAGES[activeTier];
   const currentHero = TIER_HERO_DATA[activeTier];
@@ -96,23 +96,28 @@ export default function PackagesCatalogView({
       {/* Top Floating Navigation Bar matching Screenshot (37) */}
       <header className="sticky top-0 z-50 bg-[#020b18]/90 backdrop-blur-xl border-b border-[#0e2547]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-          {/* Back Button */}
+          {/* Back Button (Icon Saja / Simpel) */}
           <button
             onClick={onBackToHome}
-            className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[#061833] hover:bg-[#0a2347] border border-[#143a6b] hover:border-cyan-400/50 text-slate-300 hover:text-white transition-all text-xs sm:text-sm font-bold cursor-pointer group"
+            aria-label="Kembali ke Beranda"
+            title="Kembali ke Beranda"
+            className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#061833] hover:bg-[#0a2347] border border-[#143a6b] hover:border-cyan-400/50 text-slate-300 hover:text-white transition-all cursor-pointer group shadow-sm shrink-0"
           >
-            <ArrowLeft className="w-4 h-4 text-cyan-400 group-hover:-translate-x-1 transition-transform" />
-            <span>Kembali ke Beranda</span>
+            <ArrowLeft className="w-5 h-5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
           </button>
 
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <div 
+            onClick={onBackToHome}
+            className="flex items-center gap-3 cursor-pointer group select-none"
+            title="Kembali ke Beranda"
+          >
             {SITE_CONFIG.logoUrl ? (
               <img
                 src={SITE_CONFIG.logoUrl}
                 alt="MavixStore"
                 referrerPolicy="no-referrer"
-                className="h-9 sm:h-11 w-auto max-w-[48px] object-contain drop-shadow-[0_0_15px_rgba(0,210,255,0.6)]"
+                className="h-9 sm:h-11 w-auto max-w-[48px] object-contain drop-shadow-[0_0_15px_rgba(0,210,255,0.6)] group-hover:scale-105 transition-transform"
               />
             ) : (
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 p-[2px]">
@@ -121,44 +126,10 @@ export default function PackagesCatalogView({
                 </div>
               </div>
             )}
-            <div className="hidden sm:flex items-center tracking-tight text-xl font-black">
+            <div className="flex items-center tracking-tight text-xl font-black">
               <span className="text-white">MAVIX</span>
               <span className="text-[#00d2ff] drop-shadow-[0_0_12px_rgba(0,210,255,0.6)]">STORE</span>
             </div>
-          </div>
-
-          {/* Tier Selection Pills in Header */}
-          <div className="flex items-center bg-[#051329] p-1 rounded-xl border border-[#0f2d59]">
-            <button
-              onClick={() => setActiveTier('lite')}
-              className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTier === 'lite'
-                  ? 'bg-cyan-400 text-slate-950 font-black shadow-[0_0_15px_rgba(0,210,255,0.4)]'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Lite
-            </button>
-            <button
-              onClick={() => setActiveTier('basic')}
-              className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTier === 'basic'
-                  ? 'bg-cyan-400 text-slate-950 font-black shadow-[0_0_15px_rgba(0,210,255,0.4)]'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Basic ★
-            </button>
-            <button
-              onClick={() => setActiveTier('prime')}
-              className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTier === 'prime'
-                  ? 'bg-cyan-400 text-slate-950 font-black shadow-[0_0_15px_rgba(0,210,255,0.4)]'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Prime
-            </button>
           </div>
         </div>
       </header>

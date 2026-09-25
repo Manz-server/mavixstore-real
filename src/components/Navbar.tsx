@@ -114,28 +114,22 @@ export default function Navbar({ onOpenOrder, onScrollTo, onOpenAdmin }: NavbarP
           </a>
         </nav>
 
-        {/* Right Action Items: Glowing SEWA SEKARANG Button */}
+        {/* Right Action Items: Glowing SEWA SEKARANG Button (Desktop & Tablet) */}
         <div className="hidden sm:flex items-center">
           <button
-            onClick={() => onOpenOrder('basic')}
-            className="px-6 py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.6)] hover:shadow-[0_0_35px_rgba(6,182,212,0.9)] transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+            onClick={() => onScrollTo('plans')}
+            className="px-6 py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.6)] hover:shadow-[0_0_35px_rgba(6,182,212,0.9)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
             id="nav-btn-sewa-sekarang"
           >
             SEWA SEKARANG
           </button>
         </div>
 
-        {/* Mobile menu button */}
-        <div className="flex sm:hidden items-center gap-2">
-          <button
-            onClick={() => onOpenOrder('basic')}
-            className="px-3.5 py-1.5 text-xs font-bold text-slate-950 bg-cyan-400 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.6)] uppercase"
-          >
-            Sewa
-          </button>
+        {/* Mobile menu button (tombol sewa dihilangkan khusus tampilan mobile) */}
+        <div className="flex sm:hidden items-center">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/60"
+            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/60 transition-colors"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -179,8 +173,8 @@ export default function Navbar({ onOpenOrder, onScrollTo, onOpenAdmin }: NavbarP
 
           <div className="pt-2 border-t border-slate-800">
             <button
-              onClick={() => { onOpenOrder('basic'); setMobileMenuOpen(false); }}
-              className="w-full py-3 text-xs font-black uppercase tracking-wider text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.6)]"
+              onClick={() => { onScrollTo('plans'); setMobileMenuOpen(false); }}
+              className="w-full py-3 text-xs font-black uppercase tracking-wider text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer"
             >
               SEWA SEKARANG
             </button>

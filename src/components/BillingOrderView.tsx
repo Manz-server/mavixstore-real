@@ -132,7 +132,7 @@ export default function BillingOrderView({
   const handleApplyPromo = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const code = promoCode.trim().toUpperCase();
-    if (code === 'ZELP33' || code === 'HEMAT' || code === 'MAVIX') {
+    if (code === 'MAVIX33' || code === 'MVX33' || code === 'HEMAT' || code === 'MAVIX') {
       const discount = Math.round(basePrice * 0.33);
       setPromoDiscount(discount);
       setAppliedPromo(code);
@@ -144,7 +144,7 @@ export default function BillingOrderView({
     }
   };
 
-  const [invoiceId] = useState(() => `ZLP-${Math.floor(100000 + Math.random() * 900000)}`);
+  const [invoiceId] = useState(() => `MVX-${Math.floor(100000 + Math.random() * 900000)}`);
 
   const handleCheckoutClick = () => {
     const tierStock = stock ? stock[packageDetails.tierId] : undefined;

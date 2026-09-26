@@ -1,6 +1,6 @@
 {
   "name": "Mavix Store - Minecraft Hosting",
-  "description": "Website hosting Minecraft modern dan terpercaya dengan performa maksimal bertenaga Intel Platinum 8370C, Intel Xeon v4 2695, dan Intel Xeon Gold 6154.",
+  "description": "MaviXStore menyediakan layanan Minecraft Server Hosting Indonesia berkecepatan tinggi dengan proteksi Anti-DDoS, garansi uptime 99.9%, dan aktivasi instan.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
